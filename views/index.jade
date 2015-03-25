@@ -1,0 +1,16 @@
+extends layout
+
+block content
+	.container-fluid
+		.row
+			.col-md-8.col-md-offset-2
+				#main(align='center')
+					//h1= title
+					//p Welcome to #{title}
+
+					h1 LectureApp
+					p Welcome to LectureApp. Upload a file to get started!
+
+					a(href='/upload')
+						button.btn.btn-primary Upload My PDF
+					br
