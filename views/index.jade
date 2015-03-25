@@ -3,14 +3,27 @@ extends layout
 block content
 	.container-fluid
 		.row
-			.col-md-8.col-md-offset-2
+			.col-md-4.col-md-offset-4
 				#main(align='center')
 					//h1= title
 					//p Welcome to #{title}
 
 					h1 LectureApp
-					p Welcome to LectureApp. Upload a file to get started!
+					p Welcome to LectureApp. Enter a session code to get started!
+					if message && message.length > 0
+						.alert.alert-danger= message
 
-					a(href='/upload')
-						button.btn.btn-primary Upload My PDF
+					form(method='get', enctype='multipart/form-data', action='/go')
+						.form-group
+							input.form-control(type='text', name='pdf_id')
+						button.btn.btn-primary(type='submit') Go!
 					br
+
+					p Or Upload a file!
+
+					form(method='post', enctype='multipart/form-data', action='/upload')
+						.form-group
+							input.form-control(type='file', name='slides')
+						button.btn.btn-primary(type='submit') Upload!
+					br
+

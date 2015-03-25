@@ -10,7 +10,7 @@ var bodyParser = require('body-parser');
 var session = require('express-session');
 var flash = require('connect-flash');
 var passport = require('passport');
-
+var multer = require('multer');
 var configDB = require('./config/database.js');
 require('./config/passport')(passport); // pass passport for configuration
 
@@ -23,6 +23,7 @@ app.set('view engine', 'jade');
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(multer({dest:'./uploads/'}));
 app.use(cookieParser());
 
 //for passport
