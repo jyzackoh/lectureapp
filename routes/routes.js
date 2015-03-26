@@ -24,7 +24,7 @@ module.exports = function(app, passport) {
 	});
 
 	app.get('/download', function(req,res) {
-		res.download("./uploads/"+req.query.pdf_id+".pdf");
+		res.download("./uploads/"+req.query.path+".pdf");
 	});
 
 	app.get('/login', function(req, res) {
@@ -59,56 +59,58 @@ module.exports = function(app, passport) {
 	});
 
 	app.post('/upload', function(req, res) {
-		var pdf_id = req.files.slides.name.slice(0, -4);
+		var path = req.files.slides.name.slice(0, -4);
 
 		//add to DB
-		Slides.findOne({ 'id': pdf_id }, function(err, slides) {
-			// if there are any errors, return the error
-			if (err) {
-				res.render('index', { message: 'error with upload, please try again!' }); 
-			} else if (slides) {
-				res.redirect("/view/" + pdf_id);
-			} else {
-				var newSlides = new Slides();
+		var addToDatabase = function(uniqueId) {
+			Slides.findOne({ 'id': path }, function(err, slides) {
+				// if there are any errors, return the error
+				if (err) {
+					res.render('index', { message: 'error with upload, please try again!' }); 
+				} else if (slides) {
+					res.redirect("/view/" + slides.id);
+				} else {
+					var newSlides = new Slides();
 
-				// set the user's local credentials
-				newSlides.id = pdf_id;
-				newSlides.user = req.user;
+					// set the user's local credentials
+					newSlides.id = uniqueId;
+					newSlides.path = path;
+					newSlides.user = req.user;
 
-				console.log(req.user);
-				console.log(newSlides.user);
+					// save the user
+					newSlides.save(function(err) {
+						if (err)
+							throw err;
+						console.log("HIHIHIHIHI SUCCESSSS!")
+						res.redirect("/analysis/" + newSlides.id);
+					});
+				}
+				return null;
+			});	
+		}
+		getUniqueId(addToDatabase);
 
-				// save the user
-				newSlides.save(function(err) {
-					if (err)
-						throw err;
-					console.log("HIHIHIHIHI SUCCESSSS!")
-					res.redirect("/analysis/" + pdf_id);
-				});
-			}
-			return null;
-		});	
 	});
 
-	app.get('/:link(view)/:id([0-9a-zA-Z]{32})$/', isLoggedIn, function(req, res) {
+	app.get('/:link(view)/:id([0-9a-zA-Z]{6})$/', isLoggedIn, function(req, res) {
 		//find slides with the input id. If have, render, else redirect to upload page
 		var pdf_id = req.params.id;
 		Slides.findOne({ 'id' :  pdf_id }, function(err, slides) {
 			if (slides) {
-				res.render('slides', { slidespath: pdf_id, user: req.user.local.email });
+				res.render('slides', { id: pdf_id, user: req.user.local.email, path: slides.path });
 			} else {
 				res.render('index', { message: (pdf_id + ' was not found, please try again!') }); 
 			}
 		});
 	});
 
-	app.get('/:link(analysis)/:id([0-9a-zA-Z]{32})$/', isLoggedIn, function(req, res) {
+	app.get('/:link(analysis)/:id([0-9a-zA-Z]{6})$/', isLoggedIn, function(req, res) {
 		//find slides with the input id. If have, render, else redirect to upload page
 		var pdf_id = req.params.id;
 		Slides.findOne({ 'id' :  pdf_id }, function(err, slides) {
 			if (slides) {
 				if (slides.user == req.user.id) {
-					res.render('analysis', { slidespath: pdf_id, user: req.user.local.email });
+					res.render('analysis', { id: pdf_id, user: req.user.local.email, path: slides.path });
 				} else {
 					res.redirect("/view/" + pdf_id);
 				}
@@ -131,4 +133,24 @@ function isLoggedIn(req, res, next) {
 	req.session.redirect_to_link = req.params.link;
 	req.session.redirect_to_id = req.params.id;
 	res.redirect('/login');
+}
+
+// route middleware to make sure a user is logged in
+function getUniqueId(addToDatabase) {
+	var text = genRandomId();
+	Slides.findOne({'id': text}, function(err, slides) {
+		if (slides) {
+			getUniqueId();
+		} else {
+			addToDatabase(text);
+		}
+	});
+}
+
+function genRandomId() {
+	var text = "";
+    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    for( var i=0; i < 6; i++ )
+        text += possible.charAt(Math.floor(Math.random() * possible.length));
+    return text;
 }

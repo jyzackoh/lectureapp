@@ -9,9 +9,12 @@ block content
 					//p Welcome to #{title}
 
 					h1 LectureApp
+					p Your Session Code: 
+					input.form-control(type='text', name='id', value='#{id}')
+					br
 					p Hi 
 						strong= user
 						, you are analysing data for slides:
 					p
-						a(href="/download/?pdf_id=#{slidespath}", title="click to download!")
-							strong= slidespath
+						a(href="/download/?path=#{path}", title="click to download!")
+							strong #{path}.pdf
