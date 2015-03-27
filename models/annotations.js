@@ -1,25 +1,16 @@
 var mongoose = require('mongoose');
-var bcrypt   = require('bcrypt-nodejs');
+var User = require('../models/users');
 
 // define the schema for our Annotation model
 var annotationSchema = mongoose.Schema({
-
-    local            : {
-        email        : String,
-        password     : String,
-    }
+	location: String,
+	type: Number,
+	page: Number,
+	slides: String,
+	user: {type:mongoose.Schema.Types.ObjectId, ref:'User'},
 });
 
 // methods ======================
-// generating a hash
-annotationSchema.methods.generateHash = function(password) {
-    return bcrypt.hashSync(password, bcrypt.genSaltSync(8), null);
-};
-
-// checking if password is valid
-annotationSchema.methods.validPassword = function(password) {
-    return bcrypt.compareSync(password, this.local.password);
-};
 
 // create the model for annotations and expose it to our app
 module.exports = mongoose.model('Annotation', annotationSchema);
