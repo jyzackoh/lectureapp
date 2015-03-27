@@ -5,8 +5,15 @@ block content
 		.row
 			.col-md-6.col-md-offset-3
 				#main(align='center')
-
 					a(href="/download/?path=#{slides.path}", title="download #{slides.name}")
 						h1.wrap-text.truncate-cell-data= slides.name
 					.embed-responsive.embed-responsive-4by3
-						iframe.embed-responsive-item(src="/ViewerJS/#../download/?path=#{slides.path}")
+						iframe#pdf-frame.embed-responsive-item(src="/ViewerJS/#../download/?path=#{slides.path}")
+					br
+					//span#nope.glyphicon.glyphicon-remove(style="font-size:40px; color:red;", onclick='$.get("/annotate", { pdf_id: "#{slides.id}", type: "1", slide_page: $("#pdf-frame").contents().find("#pageNumber")[0].value}).done(function(data){if (data.result == "ok"){$("#yes")[0].style.color="gray";$("#nope")[0].style.color="red";} else {alert(data.result);}});')
+					//|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+					//span#yes.glyphicon.glyphicon-ok(style="font-size:40px; color:green;", onclick='$.get("/annotate", { pdf_id: "#{slides.id}", type: "0", slide_page: $("#pdf-frame").contents().find("#pageNumber")[0].value}).done(function(data){if (data.result == "ok"){$("#nope")[0].style.color="gray";$("#yes")[0].style.color="green";} else {alert(data.result);}});')
+
+					span#nope.glyphicon.glyphicon-remove(style="font-size:40px; color:red;", onclick='$.get("/annotate", { pdf_id: "#{slides.id}", type: "1", slide_page: $("#pdf-frame").contents().find("#pageNumber")[0].value}).done(function(data){alert(data.result);});')
+					|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+					span#yes.glyphicon.glyphicon-ok(style="font-size:40px; color:green;", onclick='$.get("/annotate", { pdf_id: "#{slides.id}", type: "0", slide_page: $("#pdf-frame").contents().find("#pageNumber")[0].value}).done(function(data){alert(data.result);});')

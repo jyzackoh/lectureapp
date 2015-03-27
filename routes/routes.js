@@ -69,15 +69,18 @@ module.exports = function(app, passport) {
 		var slide_page = req.query.slide_page;
 		var type = req.query.type;
 		Annotation.findOne({'slides': req.query.pdf_id}).where({'user': req.user.id}).where({'page': slide_page}).exec(function(err, annotation) {
+			if (err) {
+				res.json({result: 'Annotation unsuccessful, please try again!'});
+			}
 			if (annotation) {
 				console.log(annotation);
 				if (annotation.type != type) {
 					annotation.type = type;
 					annotation.save();
-					res.json({ result: 'changed annotation' });
+					res.json({ result: 'ok' });
 				} else {
 					//send json ERR dupe req
-					res.json({ result: 'already this annotation' });
+					res.json({ result: 'ok' });
 				}
 			} else {
 				//add new one
@@ -97,7 +100,7 @@ module.exports = function(app, passport) {
 					if (err)
 						throw err;
 					//send json OK with new annotation info
-					res.json({ result: 'added new annotation' });
+					res.json({ result: 'ok' });
 				});
 			}
 		});
