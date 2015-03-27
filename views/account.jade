@@ -1,0 +1,29 @@
+extends layout
+
+block content
+	.container-fluid
+		.row
+			.col-md-8.col-md-offset-2
+				#main(align='center')
+					
+					h1 Your uploaded slides:
+					p Here are the slides you have uploaded previously. 
+						a(href="/") Click here to upload a new file
+					br
+					table.table
+						thead
+							tr
+								th Session Code
+								th File Name
+								th View
+								th Analyze
+							each slide in owned_slides
+								tr 
+									td
+										a(href="/analysis/#{slide.id}")
+											strong= slide.id
+									td= slide.name
+									td
+										a(href="/view/#{slide.id}") View
+									td
+										a(href="/analysis/#{slide.id}") Analyze

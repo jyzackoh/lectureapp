@@ -58,9 +58,19 @@ module.exports = function(app, passport) {
 		res.redirect('/');
 	});
 
+	app.get('/account', isLoggedIn, function(req, res) {
+		Slides.find({ 'user' : req.user.id }, function(err, slides) {
+			if (slides) {
+				console.log(slides);
+				res.render('account', { owned_slides: slides, user: req.user.local.email});
+			} else {
+				res.redirect('/signup');
+			}
+		});
+	});
+
 	app.post('/upload', function(req, res) {
 		var path = req.files.slides.name.slice(0, -4);
-
 		//add to DB
 		var addToDatabase = function(uniqueId) {
 			Slides.findOne({ 'id': path }, function(err, slides) {
@@ -74,6 +84,7 @@ module.exports = function(app, passport) {
 
 					// set the user's local credentials
 					newSlides.id = uniqueId;
+					newSlides.name = req.files.slides.originalname;
 					newSlides.path = path;
 					newSlides.user = req.user;
 
