@@ -59,12 +59,46 @@ module.exports = function(app, passport) {
 	});
 
 	app.get('/account', isLoggedIn, function(req, res) {
-		Slides.find({ 'user' : req.user.id }, function(err, slides) {
-			if (slides) {
-				console.log(slides);
-				res.render('account', { owned_slides: slides, user: req.user.local.email});
+		Slides.find({ 'user' : req.user.id }).exec(function(err, slides) {
+			res.render('account', { owned_slides: slides, user: req.user.local.email});
+		});
+	});
+
+	app.get('/annotate', isLoggedIn, function(req, res) {
+		var pdf_id = req.query.pdf_id;
+		var slide_page = req.query.slide_page;
+		var type = req.query.type;
+		Annotation.findOne({'slides': req.query.pdf_id}).where({'user': req.user.id}).where({'page': slide_page}).exec(function(err, annotation) {
+			if (annotation) {
+				console.log(annotation);
+				if (annotation.type != type) {
+					annotation.type = type;
+					annotation.save();
+					res.json({ result: 'ok1' });
+				} else {
+					//send json ERR dupe req
+					res.json({ result: 'err' });
+				}
 			} else {
-				res.redirect('/signup');
+				//add new one
+				var newAnnotation = new Annotation();
+
+				// set the user's local credentials
+				newAnnotation.location = 'somewhere';
+				newAnnotation.page = slide_page;
+				newAnnotation.type = type;
+				newAnnotation.slides = pdf_id;
+				newAnnotation.user = req.user;
+
+				console.log(newAnnotation.type);
+
+				// save the user
+				newAnnotation.save(function(err) {
+					if (err)
+						throw err;
+					//send json OK with new annotation info
+					res.json({ result: 'ok' });
+				});
 			}
 		});
 	});
@@ -106,7 +140,7 @@ module.exports = function(app, passport) {
 	app.get('/:link(view)/:id([0-9a-zA-Z]{6})$/', isLoggedIn, function(req, res) {
 		//find slides with the input id. If have, render, else redirect to upload page
 		var pdf_id = req.params.id;
-		Slides.findOne({ 'id' :  pdf_id }, function(err, slides) {
+		Slides.findOne({ 'id' :	pdf_id }, function(err, slides) {
 			if (slides) {
 				res.render('slides', { id: pdf_id, user: req.user.local.email, path: slides.path });
 			} else {
@@ -118,10 +152,29 @@ module.exports = function(app, passport) {
 	app.get('/:link(analysis)/:id([0-9a-zA-Z]{6})$/', isLoggedIn, function(req, res) {
 		//find slides with the input id. If have, render, else redirect to upload page
 		var pdf_id = req.params.id;
-		Slides.findOne({ 'id' :  pdf_id }, function(err, slides) {
+		Slides.findOne({ 'id' :	pdf_id }, function(err, slides) {
 			if (slides) {
 				if (slides.user == req.user.id) {
-					res.render('analysis', { id: pdf_id, user: req.user.local.email, path: slides.path });
+					// Annotation.find({'slides': pdf_id}).exec(function(err, annotation) {
+					// 	console.log(annotation);
+					// 	res.render('analysis', { id: pdf_id, user: req.user.local.email, path: slides.path, annotations: annotation });
+					// });
+					Annotation.aggregate(
+						[
+							// Grouping pipeline
+							{ "$group": { 
+									"_id": '$page', //aggregate by what?
+									"confusionCount": { "$sum": 1 },
+							}},
+							// Sorting pipeline
+							{ "$sort": { "confusionCount": -1 } }
+						],
+						function(err,annotation) {
+							 // Result is an array of documents
+							console.log(annotation);
+							res.render('analysis', { id: pdf_id, user: req.user.local.email, path: slides.path, annotations: annotation });
+						}
+					);
 				} else {
 					res.redirect("/view/" + pdf_id);
 				}
@@ -160,8 +213,8 @@ function getUniqueId(addToDatabase) {
 
 function genRandomId() {
 	var text = "";
-    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    for( var i=0; i < 6; i++ )
-        text += possible.charAt(Math.floor(Math.random() * possible.length));
-    return text;
+	var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+	for( var i=0; i < 6; i++ )
+			text += possible.charAt(Math.floor(Math.random() * possible.length));
+	return text;
 }
