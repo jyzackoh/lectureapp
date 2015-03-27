@@ -6,6 +6,7 @@ var User = require('../models/users');
 var slidesSchema = mongoose.Schema({
 	id: String,
 	path: String,
+	name: String,
 	user: {type:mongoose.Schema.Types.ObjectId, ref:'User'},
 });
 
