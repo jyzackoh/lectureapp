@@ -18,3 +18,14 @@ block content
 					p
 						a(href="/download/?path=#{path}", title="click to download!")
 							strong #{path}.pdf
+					table.table.table-hover
+						thead
+							tr
+								th.col-md-3.text-center Slide no.
+								th.col-md-3.text-center No. of Confusions
+						tbody
+							each annotation in annotations
+								tr 
+									td.text-center 
+										strong= annotation._id
+									td.text-center= annotation.confusionCount
