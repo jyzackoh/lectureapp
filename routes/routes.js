@@ -142,7 +142,7 @@ module.exports = function(app, passport) {
 		var pdf_id = req.params.id;
 		Slides.findOne({ 'id' :	pdf_id }, function(err, slides) {
 			if (slides) {
-				res.render('slides', { id: pdf_id, user: req.user.local.email, path: slides.path });
+				res.render('slides', { slides: slides, user: req.user.local.email});
 			} else {
 				res.render('index', { message: (pdf_id + ' was not found, please try again!') }); 
 			}
