@@ -6,25 +6,26 @@ block content
 			.col-md-8.col-md-offset-2
 				#main(align='center')
 					
-					h1 Your uploaded slides:
 					p Here are the slides you have uploaded previously. 
-						a(href="/") Click here to upload a new file
+					p 
+						a(href="/") Upload a new file here
 					br
-					table.table.table-hover
+					table.table.table-hover.table-layout-fixed
 						thead
 							tr
-								th Session Code
-								th File Name
-								th View
-								th Analyze
+								th.text-center Session Code
+								th.text-center File Name
+								th.text-center Action
 						tbody
 							each slide in owned_slides
 								tr 
-									td
+									td.text-center
 										a(href="/analysis/#{slide.id}")
 											strong= slide.id
-									td= slide.name
-									td
-										a(href="/view/#{slide.id}") View
-									td
-										a(href="/analysis/#{slide.id}") Analyze
+									td.text-center.truncate-cell-data= slide.name
+									td.text-center
+										a(href="/view/#{slide.id}")
+											span.glyphicon.glyphicon-zoom-in
+										| 
+										a(href="/analysis/#{slide.id}")
+											span.glyphicon.glyphicon-stats
