@@ -161,6 +161,8 @@ module.exports = function(app, passport) {
 					// });
 					Annotation.aggregate(
 						[
+							// Matching pipeline
+							{ "$match": { "slides": pdf_id }}, 
 							// Grouping pipeline
 							{ "$group": { 
 									"_id": '$page', //aggregate by what?
