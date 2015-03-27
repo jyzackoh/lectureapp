@@ -74,10 +74,10 @@ module.exports = function(app, passport) {
 				if (annotation.type != type) {
 					annotation.type = type;
 					annotation.save();
-					res.json({ result: 'ok1' });
+					res.json({ result: 'changed annotation' });
 				} else {
 					//send json ERR dupe req
-					res.json({ result: 'err' });
+					res.json({ result: 'already this annotation' });
 				}
 			} else {
 				//add new one
@@ -97,7 +97,7 @@ module.exports = function(app, passport) {
 					if (err)
 						throw err;
 					//send json OK with new annotation info
-					res.json({ result: 'ok' });
+					res.json({ result: 'added new annotation' });
 				});
 			}
 		});
@@ -166,7 +166,7 @@ module.exports = function(app, passport) {
 							// Grouping pipeline
 							{ "$group": { 
 									"_id": '$page', //aggregate by what?
-									"confusionCount": { "$sum": 1 },
+									"confusionCount": { "$sum": "$type" },
 							}},
 							// Sorting pipeline
 							{ "$sort": { "confusionCount": -1 } }

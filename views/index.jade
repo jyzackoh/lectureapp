@@ -5,17 +5,14 @@ block content
 		.row
 			.col-md-4.col-md-offset-4
 				#main(align='center')
-					//h1= title
-					//p Welcome to #{title}
-
-					h1 LectureApp
-					p Welcome to LectureApp. Enter a session code to get started!
+					h1 Welcome to LectureApp!
+					p Enter a session code to get started!
 					if message && message.length > 0
 						.alert.alert-danger= message
 
 					form(method='get', enctype='multipart/form-data', action='/go')
 						.form-group
-							input.form-control(type='text', name='pdf_id')
+							input.form-control.text-center(type='text', name='pdf_id')
 						button.btn.btn-primary(type='submit') Go!
 					br
 

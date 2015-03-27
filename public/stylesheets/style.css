@@ -1,5 +1,5 @@
 body {
-  padding: 70px;
+  padding-top: 60px;
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
 }
 
@@ -15,4 +15,8 @@ a {
 
 .table-layout-fixed {
 	table-layout:fixed;
+}
+
+.wrap-text {
+	word-wrap: break-word;
 }

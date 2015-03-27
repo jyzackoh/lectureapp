@@ -5,19 +5,24 @@ block content
 		.row
 			.col-md-8.col-md-offset-2
 				#main(align='center')
-					//h1= title
-					//p Welcome to #{title}
-
-					h1 LectureApp
-					p Your Session Code: 
-					input.form-control(type='text', name='id', value='#{id}')
+					h1 Session Stats
+					p 
+						strong Session Code: 
+					strong
+						input.form-control.text-center(type='text', name='id', value='#{id}')
 					br
-					p Hi 
-						strong= user
-						, you are analysing data for slides:
-					p
-						a(href="/download/?path=#{path}", title="click to download!")
-							strong #{path}.pdf
+					//p Hi 
+					//	strong= user
+					//	, you are analysing data for slides:
+					//p.wrap-text
+					//	a(href="/download/?path=#{path}", title="click to download!")
+					//		strong #{path}.pdf
+
+					hr
+					h2 Confusion Table
+					p Slides sorted by descending confusion. 
+						a(onclick="location.reload();") Update 
+							span.glyphicon.glyphicon-refresh
 					table.table.table-hover
 						thead
 							tr
