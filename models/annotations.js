@@ -3,9 +3,10 @@ var User = require('../models/users');
 
 // define the schema for our Annotation model
 var annotationSchema = mongoose.Schema({
-	location: String,
-	type: Number,
+	visibility: Number,
 	page: Number,
+	x: Number,
+	y: Number,
 	slides: String,
 	user: {type:mongoose.Schema.Types.ObjectId, ref:'User'},
 });

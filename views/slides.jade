@@ -5,15 +5,33 @@ block content
 		.row
 			.col-md-6.col-md-offset-3
 				#main(align='center')
-					a(href="/download/?path=#{slides.path}", title="download #{slides.name}")
-						h1.wrap-text.truncate-cell-data= slides.name
-					.embed-responsive.embed-responsive-4by3
-						iframe#pdf-frame.embed-responsive-item(src="/ViewerJS/#../download/?path=#{slides.path}")
+					//a(href="/download/?path=#{slides.path}", title="download #{slides.name}")
+						//h3.wrap-text.truncate-cell-data= slides.name
+					#iframe-parent.embed-responsive.embed-responsive-4by3
+						iframe#pdf-frame.embed-responsive-item(src="/ViewerJS/#../download/?path=#{slides.path}", allowfullscreen, webkitallowfullscreen)
+						#annotation-board
+						#annotation-signaller
+							if user.id != slides.user
+								table.annotation-table
+									- for (var i = 0; i < 18; ++i) {
+										tr
+											- for (var j = 0; j < 8; ++j) {
+												td(onclick='toggle_signal("#{slides.id}", #{i}, #{j});')
+													span
+											- }
+									- }
+							else
+								//show the stuff on the screen
 					br
-					//span#nope.glyphicon.glyphicon-remove(style="font-size:40px; color:red;", onclick='$.get("/annotate", { pdf_id: "#{slides.id}", type: "1", slide_page: $("#pdf-frame").contents().find("#pageNumber")[0].value}).done(function(data){if (data.result == "ok"){$("#yes")[0].style.color="gray";$("#nope")[0].style.color="red";} else {alert(data.result);}});')
-					//|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-					//span#yes.glyphicon.glyphicon-ok(style="font-size:40px; color:green;", onclick='$.get("/annotate", { pdf_id: "#{slides.id}", type: "0", slide_page: $("#pdf-frame").contents().find("#pageNumber")[0].value}).done(function(data){if (data.result == "ok"){$("#nope")[0].style.color="gray";$("#yes")[0].style.color="green";} else {alert(data.result);}});')
 
-					span#nope.glyphicon.glyphicon-remove(style="font-size:40px; color:red;", onclick='$.get("/annotate", { pdf_id: "#{slides.id}", type: "1", slide_page: $("#pdf-frame").contents().find("#pageNumber")[0].value}).done(function(data){alert(data.result);});')
-					|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-					span#yes.glyphicon.glyphicon-ok(style="font-size:40px; color:green;", onclick='$.get("/annotate", { pdf_id: "#{slides.id}", type: "0", slide_page: $("#pdf-frame").contents().find("#pageNumber")[0].value}).done(function(data){alert(data.result);});')
+					span.navigation-glyph.glyphicon.glyphicon-arrow-left(style="font-size:40px;" onclick='$("#pdf-frame").contents().find("#previous")[0].click();')
+					if user.id != slides.user
+						span.navigation-glyph.glyphicon.glyphicon-trash(style="font-size:40px;" onclick='clear_page_annotation("#{slides.id}");')
+					else
+						span.navigation-glyph.glyphicon.glyphicon-refresh(style="font-size:40px;" onclick='populate_annotation_board($("#pdf-frame").contents().find("#pageNumber")[0].value);')
+
+					span.navigation-glyph.glyphicon.glyphicon-arrow-right(style="font-size:40px;" onclick='$("#pdf-frame").contents().find("#next")[0].click();')
+
+
+	script(type='text/javascript').
+		init("#{slides.id}");

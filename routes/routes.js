@@ -67,44 +67,127 @@ module.exports = function(app, passport) {
 	app.get('/annotate', isLoggedIn, function(req, res) {
 		var pdf_id = req.query.pdf_id;
 		var slide_page = req.query.slide_page;
-		var type = req.query.type;
-		Annotation.findOne({'slides': req.query.pdf_id}).where({'user': req.user.id}).where({'page': slide_page}).exec(function(err, annotation) {
+		var x_val = req.query.x_val;
+		var y_val = req.query.y_val;
+		Annotation.findOne({'slides': req.query.pdf_id}).where({'user': req.user.id}).where({'page': slide_page}).where({'x': x_val}).where({'y': y_val}).exec(function(err, annotation) {
 			if (err) {
 				res.json({result: 'Annotation unsuccessful, please try again!'});
 			}
 			if (annotation) {
+				//annotation already exists, toggle visibility
 				console.log(annotation);
-				if (annotation.type != type) {
-					annotation.type = type;
+				if (annotation.visibility == 0) {
+					annotation.visibility = 1;
 					annotation.save();
-					res.json({ result: 'ok' });
+					res.json({ result: '1' });
 				} else {
-					//send json ERR dupe req
-					res.json({ result: 'ok' });
+					annotation.visibility = 0;
+					annotation.save();
+					res.json({ result: '0' });
 				}
 			} else {
 				//add new one
 				var newAnnotation = new Annotation();
 
 				// set the user's local credentials
-				newAnnotation.location = 'somewhere';
 				newAnnotation.page = slide_page;
-				newAnnotation.type = type;
+				newAnnotation.visibility = 1;
+				newAnnotation.x = x_val;
+				newAnnotation.y = y_val;
 				newAnnotation.slides = pdf_id;
 				newAnnotation.user = req.user;
 
-				console.log(newAnnotation.type);
+				console.log(newAnnotation.visibility);
 
-				// save the user
 				newAnnotation.save(function(err) {
 					if (err)
 						throw err;
 					//send json OK with new annotation info
-					res.json({ result: 'ok' });
+					res.json({ result: '1' });
 				});
 			}
 		});
 	});
+
+	app.get('/get/annotate', isLoggedIn, function(req, res) {
+	// app.get('/get/annotate', function(req, res) {
+		
+		var pdf_id = req.query.pdf_id;
+
+		if (pdf_id == undefined) {
+			res.json({ result: 'undefined pdf_id' });
+		} else {
+			Slides.findOne({ 'id' :	pdf_id }, function(err, slides) {
+				if (slides) {
+					if (slides.user == req.user.id) {
+						Annotation.find({'slides': req.query.pdf_id}).where({'visibility': 1}).exec(function(err, annotation) {
+							if (err) {
+								res.json({result: 'Annotation unsuccessful, please try again!'});
+							}
+							if (annotation) {
+								//annotation already exists, toggle visibility
+								console.log(annotation);
+								res.json({ result: annotation });
+							} else {
+								res.json({ result: '[]' });
+							}
+						});
+					} else {
+						Annotation.find({'slides': req.query.pdf_id}).where({'user': req.user.id}).where({'visibility': 1}).exec(function(err, annotation) {
+							if (err) {
+								res.json({result: 'Annotation unsuccessful, please try again!'});
+							}
+							if (annotation) {
+								//annotation already exists, toggle visibility
+								res.json({ result: annotation });
+							} else {
+								res.json({ result: '[]' });
+							}
+						});
+					}
+				} else {
+					res.json({ result: 'no such slide' });
+				}
+			});
+		}
+	});
+
+
+	app.get('/clear/annotate', isLoggedIn, function(req, res) {
+	// app.get('/get/annotate', function(req, res) {
+		
+		var pdf_id = req.query.pdf_id;
+		var page = req.query.page;
+
+		if (pdf_id == undefined || page == undefined) {
+			res.json({ result: 'undefined pdf_id' });
+		} else {
+			Slides.findOne({ 'id' :	pdf_id }, function(err, slides) {
+				if (slides) {
+					Annotation.find({'slides': req.query.pdf_id}).where({'user': req.user.id}).where({'visibility': 1}).where({'page': page}).exec(function(err, annotation) {
+						if (err) {
+							res.json({result: 'some error happened clearing annotation'});
+						}
+						if (annotation) {
+							//annotation already exists, toggle visibility
+							console.log(annotation);
+							for (var i = 0; i < annotation.length; i++) {
+								annotation[i].visibility = 0;
+								annotation[i].save();
+							}
+							res.json({ result: '[]' });
+						} else {
+							res.json({ result: '[]' });
+						}
+					});
+				} else {
+					res.json({ result: 'no such slide' });
+				}
+			});
+		}
+	});
+
+
 
 	app.post('/upload', function(req, res) {
 		var path = req.files.slides.name.slice(0, -4);
@@ -145,7 +228,7 @@ module.exports = function(app, passport) {
 		var pdf_id = req.params.id;
 		Slides.findOne({ 'id' :	pdf_id }, function(err, slides) {
 			if (slides) {
-				res.render('slides', { slides: slides, user: req.user.local.email});
+				res.render('slides', { slides: slides, user: req.user, notok: 10, isok:12});
 			} else {
 				res.render('index', { message: (pdf_id + ' was not found, please try again!') }); 
 			}
@@ -165,11 +248,11 @@ module.exports = function(app, passport) {
 					Annotation.aggregate(
 						[
 							// Matching pipeline
-							{ "$match": { "slides": pdf_id }}, 
+							{ "$match": { "slides": pdf_id, "visibility":1 }}, 
 							// Grouping pipeline
 							{ "$group": { 
 									"_id": '$page', //aggregate by what?
-									"confusionCount": { "$sum": "$type" },
+									"confusionCount": { "$sum": "$visibility" },
 							}},
 							// Sorting pipeline
 							{ "$sort": { "confusionCount": -1 } }
