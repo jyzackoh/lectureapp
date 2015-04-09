@@ -358,6 +358,7 @@ function PDFViewerPlugin() {
     };
 
     this.showPage = function (n) {
+        parent.populate_annotation_board(n);
         if (self.isSlideshow()) {
             domPages[currentPage - 1].style.display = "none";
             currentPage = n;

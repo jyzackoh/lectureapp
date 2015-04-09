@@ -593,9 +593,9 @@ html[dir='rtl'] .dropdownToolbarButton {
     padding-top: 6px;
     padding-bottom: 6px;
     position: absolute;
-    top: 32px;
+    top: 0px;
     right: 0;
-    bottom: 32px;
+    bottom: 0px;
     left: 0;
 
     text-align: center;
