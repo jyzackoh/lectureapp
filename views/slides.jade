@@ -10,6 +10,14 @@ block content
 					#iframe-parent.embed-responsive.embed-responsive-4by3
 						iframe#pdf-frame.embed-responsive-item(src="/ViewerJS/#../download/?path=#{slides.path}", allowfullscreen, webkitallowfullscreen)
 						#annotation-board
+							table.annotation-table
+								- for (var i = 0; i < 18; ++i) {
+									tr
+										- for (var j = 0; j < 8; ++j) {
+											td(id='annotation-cell-#{i}-#{j}')
+												span
+										- }
+								- }
 						#annotation-signaller
 							if user.id != slides.user
 								table.annotation-table
@@ -31,6 +39,9 @@ block content
 						span.navigation-glyph.glyphicon.glyphicon-refresh(onclick='populate_annotation_board($("#pdf-frame").contents().find("#pageNumber")[0].value);')
 						a(href="/analysis/#{slides.id}")
 							span.navigation-glyph.glyphicon.glyphicon-stats
+						span#hide-annotations.navigation-glyph.glyphicon.glyphicon-eye-close(onclick='hide_annotations();')
+						span#show-annotations.navigation-glyph.glyphicon.glyphicon-eye-open(onclick='show_annotations();', style='display:none;')
+						span.navigation-glyph.glyphicon.glyphicon-fullscreen(onclick='go_fullscreen();')
 
 					span.navigation-glyph.glyphicon.glyphicon-arrow-right(onclick='$("#pdf-frame").contents().find("#next")[0].click();')
 

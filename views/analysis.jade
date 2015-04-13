@@ -10,17 +10,21 @@ block content
 						a(href="/view/#{id}")
 							span.glyphicon.glyphicon-zoom-in
 						strong Session Code: 
-					strong
-						input.form-control.text-center(type='text', name='id', value='#{id}')
-					br
-					//p Hi 
-					//	strong= user
-					//	, you are analysing data for slides:
-					//p.wrap-text
-					//	a(href="/download/?path=#{path}", title="click to download!")
-					//		strong #{path}.pdf
+						| #{id}
+					p
+						strong Number of Users Participated: 
+						| #{num_users}
 
 					hr
+
+					h2 Confusion Chart
+					p 
+						a(onclick="location.reload();") Update 
+							span.glyphicon.glyphicon-refresh
+					canvas.charts(id="confusion-chart")
+
+					hr
+
 					h2 Confusion Table
 					p Slides sorted by descending confusion. 
 						a(onclick="location.reload();") Update 
@@ -36,3 +40,7 @@ block content
 									td.text-center 
 										strong= annotation._id
 									td.text-center= annotation.confusionCount
+
+
+	script(type='text/javascript').
+		load_chart(!{JSON.stringify(annotations)});

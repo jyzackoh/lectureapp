@@ -29,7 +29,7 @@ module.exports = function(app, passport) {
 
 	app.get('/login', function(req, res) {
 		// render the page and pass in any flash data if it exists
-		res.render('login', { message: req.flash('loginMessage') }); 
+		res.render('login', { message: req.flash('loginMessage'), no_nav: true }); 
 		// res.render('login'); 
 	});
 
@@ -42,7 +42,7 @@ module.exports = function(app, passport) {
 
 	app.get('/signup', function(req, res) {
 		// render the page and pass in any flash data if it exists
-		res.render('signup', { message: req.flash('signupMessage') });
+		res.render('signup', { message: req.flash('signupMessage'), no_nav: true });
 		// res.render('signup');
 	});
 
@@ -260,8 +260,23 @@ module.exports = function(app, passport) {
 						],
 						function(err,annotation) {
 							 // Result is an array of documents
-							console.log(annotation);
-							res.render('analysis', { id: pdf_id, user: req.user.local.email, path: slides.path, annotations: annotation });
+							Annotation.aggregate(
+								[
+									// Matching pipeline
+									{ "$match": { "slides": pdf_id, "visibility":1 }}, 
+									// Grouping pipeline
+									{ "$group": { 
+											"_id": '$user', //aggregate by what?
+									}},
+								],
+								function(err,participated_users) {
+									 // Result is an array of documents
+									var num_users = participated_users.length;
+									res.render('analysis', { id: pdf_id, user: req.user.local.email, path: slides.path, annotations: annotation, num_users:num_users });
+								}
+							);
+							// console.log(annotation);
+							// res.render('analysis', { id: pdf_id, user: req.user.local.email, path: slides.path, annotations: annotation });
 						}
 					);
 				} else {
