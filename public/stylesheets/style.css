@@ -54,4 +54,6 @@ a {
 .navigation-glyph {
 	padding-left:10px;
 	padding-right:10px;
+	font-size:30px;
+	color:rgb(51, 122, 183);
 }

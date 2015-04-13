@@ -213,7 +213,8 @@ module.exports = function(app, passport) {
 						if (err)
 							throw err;
 						console.log("HIHIHIHIHI SUCCESSSS!")
-						res.redirect("/analysis/" + newSlides.id);
+						// res.redirect("/analysis/" + newSlides.id);
+						res.redirect("/account/");
 					});
 				}
 				return null;

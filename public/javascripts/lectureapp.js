@@ -106,7 +106,7 @@ function clear_page_annotation(slide_id) {
 function update_annotation_cell(x,y) {
 	color_index = lectureapp.annotation_data[x][y]-1;
 	if (color_index >= 0) {
-		$('#annotation-cell-' + x + '-' + y).css({'background':"#"+lectureapp.color_code[color_index], 'opacity':0.2});
+		$('#annotation-cell-' + x + '-' + y).css({'background':"#"+lectureapp.color_code[color_index], 'opacity':0.3});
 	} else {
 		$('#annotation-cell-' + x + '-' + y).css({'background':'none'});
 	}
@@ -122,7 +122,7 @@ function write_to_annotation_board() {
 				if (color_index > lectureapp.color_code.length) {
 					color_index = lectureapp.color_code.length;
 				}
-				annotation_html += ("<td id='annotation-cell-" +i+ "-" +j+ "' style='background:#"+lectureapp.color_code[color_index]+";opacity:0.2'><span></span></td>");	
+				annotation_html += ("<td id='annotation-cell-" +i+ "-" +j+ "' style='background:#"+lectureapp.color_code[color_index]+";opacity:0.3'><span></span></td>");	
 			} else {
 				annotation_html += ("<td id='annotation-cell-" +i+ "-" +j+ "'><span></span></td>");	
 			}
