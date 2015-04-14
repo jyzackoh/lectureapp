@@ -108,7 +108,6 @@ function clear_page_annotation(slide_id) {
 	}).done(function(data){
 		lectureapp.data = data;
 		var result = data.result;
-		alert(result);
 		populate_annotation_board(currpage);
 	});	
 }
